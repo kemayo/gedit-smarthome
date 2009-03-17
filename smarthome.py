@@ -1,4 +1,4 @@
-# -*- coding: utf-8 ts: 4 -*-
+# -*- coding: utf-8 -*-
 #
 # Make HOME and END keys move to first/last characters on line first before
 # going to the start/end of the line. (It's just a gksourceview2 property.)
@@ -20,12 +20,13 @@
 
 import gedit
 
+from gtksourceview2 import SMART_HOME_END_BEFORE
 
 class SmartHome(gedit.Plugin):
-
 	def activate(self, window):
 		for view in window.get_views():
-			view.set_smart_home_end(True)
+			view.set_data("SmartHomePluginOriginalValue", view.get_property('smart-home-end'))
+			view.set_property('smart-home-end', SMART_HOME_END_BEFORE)
 
 		tab_added_id = window.connect("tab_added", lambda w, t: t.get_view().set_smart_home_end(True))
 		window.set_data("SmartHomePluginHandlerId", tab_added_id)
@@ -36,5 +37,5 @@ class SmartHome(gedit.Plugin):
 		window.set_data("SmartHomePluginHandlerId", None)
 
 		for view in window.get_views():
-			view.set_smart_home_end(False)
+			view.set_property('smart-home-end', view.get_data("SmartHomePluginOriginalValue"))
 
